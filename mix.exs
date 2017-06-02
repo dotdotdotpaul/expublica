@@ -7,7 +7,17 @@ defmodule ExPublica.Mixfile do
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     deps: deps()]
+     deps: deps(),
+     package: package]
+  end
+
+  def package do
+    [
+      files: ["lib", "mix.exs", "README.md", "LICENSE"],
+      maintainers: ["Paul Clegg"],
+      licenses: ["Apache 2.0"],
+      links: %{"GitHub" => "https://github.com/dotdotdotpaul/expublica"}
+    ]
   end
 
   # Configuration for the OTP application
