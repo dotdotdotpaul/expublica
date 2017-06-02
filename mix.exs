@@ -8,7 +8,7 @@ defmodule ExPublica.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
-     package: package]
+     package: package()]
   end
 
   def package do
@@ -39,6 +39,9 @@ defmodule ExPublica.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    []
+    [
+      {:poison, "~> 3.0"},
+      {:httpoison, "~> 0.11.1"}
+    ]
   end
 end
