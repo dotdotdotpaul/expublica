@@ -9,7 +9,8 @@ defmodule ExPublica.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
-     package: package()]
+     package: package(),
+     description: description()]
   end
 
   def package do
@@ -19,6 +20,12 @@ defmodule ExPublica.Mixfile do
       licenses: ["Apache 2.0"],
       links: %{"GitHub" => "https://github.com/dotdotdotpaul/expublica"}
     ]
+  end
+
+  def description do
+    """
+      Library for accessing ProPublica's data via their APIs.
+    """
   end
 
   # Configuration for the OTP application
