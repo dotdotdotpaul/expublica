@@ -49,7 +49,9 @@ defmodule ExPublica.Mixfile do
   defp deps do
     [
       {:poison, "~> 3.0"},
-      {:httpoison, "~> 0.11.1"}
+      {:httpoison, "~> 0.11.1"},
+
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 end
