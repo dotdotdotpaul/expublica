@@ -18,11 +18,11 @@ defmodule ExPublica.Members do
               :missed_votes_pct, :votes_with_party_pct]
 
 
-  def start_link(), do: GenServer.start_link(__MODULE__, %{})
+  def start_link(), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 
-  def list(pid, chamber, congress \\ 115), do: do_list(pid, chamber, congress)
+  def list(chamber, congress \\ 115), do: do_list(chamber, congress)
   defp do_list(pid, chamber, congress) when is_integer(congress) do
-    GenServer.call(pid, {:list, chamber, congress})
+    GenServer.call(__MODULE__, {:list, chamber, congress})
   end
   defp do_list(pid, chamber, congress) when is_binary(congress) do
     do_list(pid, chamber, String.to_integer(congress))
@@ -41,26 +41,29 @@ defmodule ExPublica.Members do
     handle_call({:list, String.downcase(to_string(chamber)), congress},
                 from, state)
   end
+  # Cache handling
   defp handle_list(congress, chamber, from, state) do
-    case API.get("https://api.propublica.org/congress/v1/#{congress}/#{chamber}/members.json") do
-      {:ok, resp } -> {:reply, result_from_response(resp.body), state}
-      error -> {:reply, error.body, state}
+    new_state = Map.put_new_lazy(state, congress, fn -> %{} end)
+    congress_state = Map.get(new_state, congress)
+    new_congress_state = Map.put_new_lazy(congress_state, chamber,
+                               fn -> retrieve(congress, chamber) end)
+    response = case Map.get(new_congress_state, chamber) do
+      {:error, errors} -> {:error, errors}
+      members -> {:ok, members}
     end
+    
+    {:reply, response, %{new_state | congress => new_congress_state}}
+  end
+
+  defp retrieve(congress, chamber) do
+    {:ok, response} = API.get("https://api.propublica.org/congress/v1/#{congress}/#{chamber}/members.json")
+    result_from_response(response.body)
   end
   defp result_from_response(%{"results" => [results|_]}) do
-    {:ok, Map.get(results, "members") |> Enum.map(&Member.from_json/1)}
+    Map.get(results, "members") |> Enum.map(&Member.from_json/1)
   end
   defp result_from_response(response) do
     {:error, Map.get(response, "errors") |> Enum.map(&(Map.get(&1, "error")))}
-  end
-
-  def by_id(id) when is_binary(id) do
-    {:ok, resp} = "https://api.propublica.org/congress/v1/members/#{id}.json"
-                  |> API.get()
-    case resp.body do
-      %{"results" => results} -> results |> List.first |> Member.from_json
-      _ -> nil
-    end
   end
 
 end
