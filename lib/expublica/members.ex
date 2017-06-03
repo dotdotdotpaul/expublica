@@ -1,7 +1,6 @@
 defmodule ExPublica.Members do
   use GenServer
 
-  alias __MODULE__
   alias ExPublica.{API, Member}
 
   @enforce_keys [:id]
@@ -21,11 +20,11 @@ defmodule ExPublica.Members do
   def start_link(), do: GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
 
   def list(chamber, congress \\ 115), do: do_list(chamber, congress)
-  defp do_list(pid, chamber, congress) when is_integer(congress) do
+  defp do_list(chamber, congress) when is_integer(congress) do
     GenServer.call(__MODULE__, {:list, chamber, congress})
   end
-  defp do_list(pid, chamber, congress) when is_binary(congress) do
-    do_list(pid, chamber, String.to_integer(congress))
+  defp do_list(chamber, congress) when is_binary(congress) do
+    do_list(chamber, String.to_integer(congress))
   end
 
   ### GenServer implementations
@@ -42,7 +41,7 @@ defmodule ExPublica.Members do
                 from, state)
   end
   # Cache handling
-  defp handle_list(congress, chamber, from, state) do
+  defp handle_list(congress, chamber, _from, state) do
     new_state = Map.put_new_lazy(state, congress, fn -> %{} end)
     congress_state = Map.get(new_state, congress)
     new_congress_state = Map.put_new_lazy(congress_state, chamber,

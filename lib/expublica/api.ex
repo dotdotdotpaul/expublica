@@ -10,7 +10,7 @@ defmodule ExPublica.API do
   end
 
   def process_request_headers(headers) do
-    Dict.put(headers, :"X-API-Key", key())
+    Map.put(headers, :"X-API-Key", key())
   end
 
   def process_request_options(options \\ []) do

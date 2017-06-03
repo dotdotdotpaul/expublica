@@ -5,6 +5,7 @@ defmodule ExPublica.Mixfile do
     [app: :expublica,
      version: "0.1.0",
      elixir: "~> 1.4",
+     source_url: "https://github.com/dotdotdotpaul/expublica",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps(),
